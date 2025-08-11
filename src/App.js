@@ -170,7 +170,7 @@ const UserIcon = () => (
 
 // --- Components ---
 
-const Navbar = ({ setPage, cartCount, wishlistCount }) => {
+const Navbar = ({ navigate, cartCount, wishlistCount }) => {
     const { user, isAdmin } = useAuth();
     const [openDropdown, setOpenDropdown] = useState('');
     const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -184,7 +184,7 @@ const Navbar = ({ setPage, cartCount, wishlistCount }) => {
 
     const handleLogout = async () => {
         await signOut(auth);
-        setPage('home');
+        navigate('home');
     };
 
     return (
@@ -193,7 +193,7 @@ const Navbar = ({ setPage, cartCount, wishlistCount }) => {
                 <div className="flex items-center justify-between h-20">
                     {/* Logo */}
                     <div className="flex-shrink-0">
-                        <a href="#" onClick={() => setPage('home')} className="text-2xl font-bold text-gray-800 tracking-wider">
+                        <a href="#/home" onClick={(e) => {e.preventDefault(); navigate('home')}} className="text-2xl font-bold text-gray-800 tracking-wider">
                             VOGUE
                         </a>
                     </div>
@@ -208,7 +208,7 @@ const Navbar = ({ setPage, cartCount, wishlistCount }) => {
                                 <div className={`absolute top-full -left-4 mt-0 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transform transition-transform duration-300 ease-in-out ${openDropdown === category ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
                                     <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
                                         {Object.entries(navLinks[category]).map(([subCategory, page]) => (
-                                            <a key={page} href="#" onClick={() => setPage(page)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                                            <a key={page} href={`#/${page}`} onClick={(e) => {e.preventDefault(); navigate(page)}} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
                                                 {subCategory}
                                             </a>
                                         ))}
@@ -221,7 +221,7 @@ const Navbar = ({ setPage, cartCount, wishlistCount }) => {
                     {/* Icons & Search */}
                     <div className="flex items-center space-x-4">
                          {isAdmin && (
-                            <button onClick={() => setPage('admin')} className="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition">
+                            <button onClick={() => navigate('admin')} className="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition">
                                 Admin Panel
                             </button>
                         )}
@@ -230,22 +230,22 @@ const Navbar = ({ setPage, cartCount, wishlistCount }) => {
                         </button>
                         {user && !user.isAnonymous ? (
                             <div className="relative group">
-                                <button onClick={() => setPage('profile')} className="text-gray-600 hover:text-gray-900"><UserIcon /></button>
+                                <button onClick={() => navigate('profile')} className="text-gray-600 hover:text-gray-900"><UserIcon /></button>
                                 <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">
                                     <div className="py-1">
-                                        <a href="#" onClick={() => setPage('profile')} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+                                        <a href="#/profile" onClick={(e) => {e.preventDefault(); navigate('profile')}} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
                                         <a href="#" onClick={handleLogout} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</a>
                                     </div>
                                 </div>
                             </div>
                         ) : (
-                            <button onClick={() => setPage('login')} className="text-gray-600 hover:text-gray-900"><UserIcon /></button>
+                            <button onClick={() => navigate('login')} className="text-gray-600 hover:text-gray-900"><UserIcon /></button>
                         )}
-                        <button onClick={() => setPage('wishlist')} className="relative text-gray-600 hover:text-gray-900">
+                        <button onClick={() => navigate('wishlist')} className="relative text-gray-600 hover:text-gray-900">
                             <HeartIcon />
                             {wishlistCount > 0 && <span className="absolute -top-2 -right-2 bg-indigo-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">{wishlistCount}</span>}
                         </button>
-                        <button onClick={() => setPage('cart')} className="relative text-gray-600 hover:text-gray-900">
+                        <button onClick={() => navigate('cart')} className="relative text-gray-600 hover:text-gray-900">
                             <ShoppingCartIcon />
                             {cartCount > 0 && <span className="absolute -top-2 -right-2 bg-indigo-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">{cartCount}</span>}
                         </button>
@@ -267,7 +267,7 @@ const Navbar = ({ setPage, cartCount, wishlistCount }) => {
     );
 };
 
-const ShopNowModal = ({ setPage, setShowModal }) => {
+const ShopNowModal = ({ navigate, setShowModal }) => {
     const categories = {
         'Men': 'men-shirts',
         'Women': 'women-tops',
@@ -276,7 +276,7 @@ const ShopNowModal = ({ setPage, setShowModal }) => {
     };
 
     const handleCategoryClick = (page) => {
-        setPage(page);
+        navigate(page);
         setShowModal(false);
     };
 
@@ -296,20 +296,20 @@ const ShopNowModal = ({ setPage, setShowModal }) => {
     );
 };
 
-const FeaturedProducts = ({ products, onAddToCart, onAddToWishlist, setPage }) => (
+const FeaturedProducts = ({ products, onAddToCart, onAddToWishlist, navigate }) => (
     <div className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">Featured Products</h2>
             <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
                 {products.slice(0, 8).map((product) => (
-                    <ProductCard key={product.id} product={product} onAddToCart={onAddToCart} onAddToWishlist={onAddToWishlist} setPage={setPage} />
+                    <ProductCard key={product.id} product={product} onAddToCart={onAddToCart} onAddToWishlist={onAddToWishlist} navigate={navigate} />
                 ))}
             </div>
         </div>
     </div>
 );
 
-const HomePage = ({ setPage, products, onAddToCart, onAddToWishlist }) => {
+const HomePage = ({ navigate, products, onAddToCart, onAddToWishlist }) => {
     const animatedTexts = ["Timeless Style", "Modern Trends", "Unmatched Quality"];
     const [currentTextIndex, setCurrentTextIndex] = useState(0);
     const [showShopNowModal, setShowShopNowModal] = useState(false);
@@ -323,7 +323,7 @@ const HomePage = ({ setPage, products, onAddToCart, onAddToWishlist }) => {
 
     return (
         <div>
-            {showShopNowModal && <ShopNowModal setPage={setPage} setShowModal={setShowShopNowModal} />}
+            {showShopNowModal && <ShopNowModal navigate={navigate} setShowModal={setShowShopNowModal} />}
             {/* Hero Section */}
             <div className="relative bg-gray-900 text-white h-[60vh] flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0">
@@ -345,32 +345,32 @@ const HomePage = ({ setPage, products, onAddToCart, onAddToWishlist }) => {
             </div>
 
             {/* Featured Products Section */}
-            <FeaturedProducts products={products} onAddToCart={onAddToCart} onAddToWishlist={onAddToWishlist} setPage={setPage} />
+            <FeaturedProducts products={products} onAddToCart={onAddToCart} onAddToWishlist={onAddToWishlist} navigate={navigate} />
 
             {/* Categories Section */}
             <div className="py-16 bg-gray-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">Shop by Category</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        <div className="group relative cursor-pointer overflow-hidden rounded-lg shadow-lg" onClick={() => setPage('men-shirts')}>
+                        <div className="group relative cursor-pointer overflow-hidden rounded-lg shadow-lg" onClick={() => navigate('men-shirts')}>
                             <img src="https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?q=80&w=2070&auto=format&fit=crop" className="w-full h-80 object-cover rounded-lg transform group-hover:scale-110 transition-transform duration-500" />
                             <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center rounded-lg group-hover:bg-opacity-50 transition">
                                 <h3 className="text-white text-2xl font-bold">Men</h3>
                             </div>
                         </div>
-                        <div className="group relative cursor-pointer overflow-hidden rounded-lg shadow-lg" onClick={() => setPage('women-tops')}>
+                        <div className="group relative cursor-pointer overflow-hidden rounded-lg shadow-lg" onClick={() => navigate('women-tops')}>
                             <img src="https://images.unsplash.com/photo-1572804013427-4d7ca7268217?q=80&w=1965&auto=format&fit=crop" className="w-full h-80 object-cover rounded-lg transform group-hover:scale-110 transition-transform duration-500" />
                             <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center rounded-lg group-hover:bg-opacity-50 transition">
                                 <h3 className="text-white text-2xl font-bold">Women</h3>
                             </div>
                         </div>
-                        <div className="group relative cursor-pointer overflow-hidden rounded-lg shadow-lg" onClick={() => setPage('children-t-shirts')}>
+                        <div className="group relative cursor-pointer overflow-hidden rounded-lg shadow-lg" onClick={() => navigate('children-t-shirts')}>
                             <img src="https://images.unsplash.com/photo-1514090098549-5c34c4149667?q=80&w=1974&auto=format&fit=crop" className="w-full h-80 object-cover rounded-lg transform group-hover:scale-110 transition-transform duration-500" />
                             <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center rounded-lg group-hover:bg-opacity-50 transition">
                                 <h3 className="text-white text-2xl font-bold">Children</h3>
                             </div>
                         </div>
-                        <div className="group relative cursor-pointer overflow-hidden rounded-lg shadow-lg" onClick={() => setPage('accessories-bags')}>
+                        <div className="group relative cursor-pointer overflow-hidden rounded-lg shadow-lg" onClick={() => navigate('accessories-bags')}>
                             <img src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?q=80&w=1935&auto=format&fit=crop" className="w-full h-80 object-cover rounded-lg transform group-hover:scale-110 transition-transform duration-500" />
                             <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center rounded-lg group-hover:bg-opacity-50 transition">
                                 <h3 className="text-white text-2xl font-bold">Accessories</h3>
@@ -383,15 +383,15 @@ const HomePage = ({ setPage, products, onAddToCart, onAddToWishlist }) => {
     );
 };
 
-const ProductCard = ({ product, onAddToCart, onAddToWishlist, setPage }) => (
+const ProductCard = ({ product, onAddToCart, onAddToWishlist, navigate }) => (
     <div className="group relative border rounded-lg p-4 flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 animate-fade-in">
-        <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none cursor-pointer" onClick={() => setPage(`product/${product.id}`)}>
+        <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none cursor-pointer" onClick={() => navigate(`product/${product.id}`)}>
             <img src={product.image} alt={product.name} className="h-full w-full object-cover object-center lg:h-full lg:w-full transition-transform duration-500 group-hover:scale-110" />
         </div>
         <div className="mt-4 flex justify-between">
             <div>
                 <h3 className="text-sm text-gray-700">
-                    <a href="#" onClick={(e) => { e.preventDefault(); setPage(`product/${product.id}`); }}>
+                    <a href={`#product/${product.id}`} onClick={(e) => { e.preventDefault(); navigate(`product/${product.id}`); }}>
                         <span aria-hidden="true" className="absolute inset-0" />
                         {product.name}
                     </a>
@@ -407,7 +407,7 @@ const ProductCard = ({ product, onAddToCart, onAddToWishlist, setPage }) => (
 );
 
 
-const ProductListPage = ({ category, setPage, onAddToCart, onAddToWishlist, products }) => {
+const ProductListPage = ({ category, navigate, onAddToCart, onAddToWishlist, products }) => {
     const [filteredProducts, setFilteredProducts] = useState([]);
     
     useEffect(() => {
@@ -427,7 +427,7 @@ const ProductListPage = ({ category, setPage, onAddToCart, onAddToWishlist, prod
 
                 <div className="mt-6 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
                     {filteredProducts.map((product) => (
-                        <ProductCard key={product.id} product={product} onAddToCart={onAddToCart} onAddToWishlist={onAddToWishlist} setPage={setPage} />
+                        <ProductCard key={product.id} product={product} onAddToCart={onAddToCart} onAddToWishlist={onAddToWishlist} navigate={navigate} />
                     ))}
                 </div>
             </div>
@@ -487,7 +487,7 @@ const ProductDetailPage = ({ productId, onAddToCart, onAddToWishlist, products }
     );
 };
 
-const CartPage = ({ cart, setPage }) => {
+const CartPage = ({ cart, navigate }) => {
     const { user } = useAuth();
     
     const removeFromCart = async (productId) => {
@@ -506,7 +506,7 @@ const CartPage = ({ cart, setPage }) => {
         <div className="max-w-4xl mx-auto py-12 px-4 animate-fade-in">
             <h1 className="text-3xl font-bold mb-8">Your Shopping Cart</h1>
             {cart.length === 0 ? (
-                <p>Your cart is empty. <a href="#" onClick={() => setPage('men-shirts')} className="text-indigo-600 hover:underline">Start shopping!</a></p>
+                <p>Your cart is empty. <a href="#/men-shirts" onClick={(e) => {e.preventDefault(); navigate('men-shirts')}} className="text-indigo-600 hover:underline">Start shopping!</a></p>
             ) : (
                 <div>
                     <ul className="divide-y divide-gray-200">
@@ -518,7 +518,7 @@ const CartPage = ({ cart, setPage }) => {
                                 <div className="ml-4 flex flex-1 flex-col">
                                     <div>
                                         <div className="flex justify-between text-base font-medium text-gray-900">
-                                            <h3><a href="#" onClick={() => setPage(`product/${item.id}`)}>{item.name}</a></h3>
+                                            <h3><a href={`#product/${item.id}`} onClick={(e) => {e.preventDefault(); navigate(`product/${item.id}`)}}>{item.name}</a></h3>
                                             <p className="ml-4">₹{item.price.toFixed(2)}</p>
                                         </div>
                                     </div>
@@ -539,7 +539,7 @@ const CartPage = ({ cart, setPage }) => {
                         </div>
                         <p className="mt-0.5 text-sm text-gray-500">Shipping and taxes calculated at checkout.</p>
                         <div className="mt-6">
-                            <button onClick={() => setPage('checkout')} className="w-full flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700">Checkout</button>
+                            <button onClick={() => navigate('checkout')} className="w-full flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700">Checkout</button>
                         </div>
                     </div>
                 </div>
@@ -549,7 +549,7 @@ const CartPage = ({ cart, setPage }) => {
 };
 
 
-const WishlistPage = ({ wishlist, onAddToCart, setPage }) => {
+const WishlistPage = ({ wishlist, onAddToCart, navigate }) => {
     const { user } = useAuth();
     
     const removeFromWishlist = async (productId) => {
@@ -571,12 +571,12 @@ const WishlistPage = ({ wishlist, onAddToCart, setPage }) => {
         <div className="max-w-4xl mx-auto py-12 px-4 animate-fade-in">
             <h1 className="text-3xl font-bold mb-8">Your Wishlist</h1>
             {wishlist.length === 0 ? (
-                <p>Your wishlist is empty. <a href="#" onClick={() => setPage('men-shirts')} className="text-indigo-600 hover:underline">Find something you love!</a></p>
+                <p>Your wishlist is empty. <a href="#/men-shirts" onClick={(e) => {e.preventDefault(); navigate('men-shirts')}} className="text-indigo-600 hover:underline">Find something you love!</a></p>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
                     {wishlist.map(item => (
                         <div key={item.id} className="border rounded-lg p-4 flex flex-col text-center transition-all duration-300 hover:shadow-xl">
-                            <img src={item.image} alt={item.name} className="w-full h-48 object-cover rounded-md mb-4 cursor-pointer" onClick={() => setPage(`product/${item.id}`)} />
+                            <img src={item.image} alt={item.name} className="w-full h-48 object-cover rounded-md mb-4 cursor-pointer" onClick={() => navigate(`product/${item.id}`)} />
                             <h3 className="font-semibold text-gray-800">{item.name}</h3>
                             <p className="text-gray-600 my-2">₹{item.price.toFixed(2)}</p>
                             <div className="mt-auto flex flex-col space-y-2">
@@ -591,7 +591,7 @@ const WishlistPage = ({ wishlist, onAddToCart, setPage }) => {
     );
 };
 
-const LoginPage = ({ setPage }) => {
+const LoginPage = ({ navigate }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -601,7 +601,7 @@ const LoginPage = ({ setPage }) => {
         setError('');
         try {
             await signInWithEmailAndPassword(auth, email, password);
-            setPage('home');
+            navigate('home');
         } catch (err) {
             setError(err.message);
         }
@@ -633,7 +633,7 @@ const LoginPage = ({ setPage }) => {
                 </form>
                 <p className="mt-2 text-center text-sm text-gray-600">
                     Or{' '}
-                    <a href="#" onClick={() => setPage('signup')} className="font-medium text-indigo-600 hover:text-indigo-500">
+                    <a href="#/signup" onClick={(e) => {e.preventDefault(); navigate('signup')}} className="font-medium text-indigo-600 hover:text-indigo-500">
                         create a new account
                     </a>
                 </p>
@@ -642,7 +642,7 @@ const LoginPage = ({ setPage }) => {
     );
 };
 
-const SignUpPage = ({ setPage }) => {
+const SignUpPage = ({ navigate }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -652,7 +652,7 @@ const SignUpPage = ({ setPage }) => {
         setError('');
         try {
             await createUserWithEmailAndPassword(auth, email, password);
-            setPage('home');
+            navigate('home');
         } catch (err) {
             setError(err.message);
         }
@@ -684,7 +684,7 @@ const SignUpPage = ({ setPage }) => {
                 </form>
                 <p className="mt-2 text-center text-sm text-gray-600">
                     Already have an account?{' '}
-                    <a href="#" onClick={() => setPage('login')} className="font-medium text-indigo-600 hover:text-indigo-500">
+                    <a href="#/login" onClick={(e) => {e.preventDefault(); navigate('login')}} className="font-medium text-indigo-600 hover:text-indigo-500">
                         Sign in
                     </a>
                 </p>
@@ -762,19 +762,19 @@ const CheckoutPage = ({ cart }) => {
     );
 };
 
-const ProfilePage = ({ setPage }) => {
+const ProfilePage = ({ navigate }) => {
     const { user } = useAuth();
 
     const handleLogout = async () => {
         await signOut(auth);
-        setPage('home');
+        navigate('home');
     };
 
     if (!user || user.isAnonymous) {
         return (
             <div className="text-center py-20">
                 <p>You are not logged in.</p>
-                <button onClick={() => setPage('login')} className="mt-4 px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+                <button onClick={() => navigate('login')} className="mt-4 px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
                     Login
                 </button>
             </div>
@@ -948,17 +948,17 @@ const AdminPanelPage = () => {
 };
 
 
-const Footer = ({ setPage }) => (
+const Footer = ({ navigate }) => (
     <footer className="bg-gray-800 text-white">
         <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                 <div>
                     <h3 className="text-sm font-semibold uppercase tracking-wider">Shop</h3>
                     <ul className="mt-4 space-y-2">
-                        <li><a href="#" onClick={() => setPage('men-shirts')} className="text-base text-gray-300 hover:text-white">Men</a></li>
-                        <li><a href="#" onClick={() => setPage('women-tops')} className="text-base text-gray-300 hover:text-white">Women</a></li>
-                        <li><a href="#" onClick={() => setPage('children-t-shirts')} className="text-base text-gray-300 hover:text-white">Children</a></li>
-                        <li><a href="#" onClick={() => setPage('accessories-bags')} className="text-base text-gray-300 hover:text-white">Accessories</a></li>
+                        <li><a href="#/men-shirts" onClick={(e) => {e.preventDefault(); navigate('men-shirts')}} className="text-base text-gray-300 hover:text-white">Men</a></li>
+                        <li><a href="#/women-tops" onClick={(e) => {e.preventDefault(); navigate('women-tops')}} className="text-base text-gray-300 hover:text-white">Women</a></li>
+                        <li><a href="#/children-t-shirts" onClick={(e) => {e.preventDefault(); navigate('children-t-shirts')}} className="text-base text-gray-300 hover:text-white">Children</a></li>
+                        <li><a href="#/accessories-bags" onClick={(e) => {e.preventDefault(); navigate('accessories-bags')}} className="text-base text-gray-300 hover:text-white">Accessories</a></li>
                     </ul>
                 </div>
                 <div>
@@ -993,11 +993,11 @@ const Footer = ({ setPage }) => (
     </footer>
 );
 
-const NotFoundPage = ({ setPage }) => (
+const NotFoundPage = ({ navigate }) => (
     <div className="text-center py-20">
         <h1 className="text-4xl font-bold">404 - Page Not Found</h1>
         <p className="mt-4">The page you are looking for does not exist.</p>
-        <button onClick={() => setPage('home')} className="mt-8 px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+        <button onClick={() => navigate('home')} className="mt-8 px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
             Go to Homepage
         </button>
     </div>
@@ -1011,6 +1011,36 @@ function App() {
     const [products, setProducts] = useState([]);
     const [loadingProducts, setLoadingProducts] = useState(true);
     const { user, isAdmin } = useAuth();
+
+    // This function handles navigation and updates browser history
+    const navigate = (newPage) => {
+        if (page !== newPage) {
+            setPage(newPage);
+            window.history.pushState({ page: newPage }, '', `#/${newPage}`);
+        }
+    };
+
+    // This effect handles the browser's back/forward buttons and initial page load
+    useEffect(() => {
+        const handlePopState = (event) => {
+            if (event.state) {
+                setPage(event.state.page);
+            } else {
+                setPage('home');
+            }
+        };
+
+        // Set initial page from URL hash
+        const initialPage = window.location.hash.substring(2) || 'home';
+        setPage(initialPage);
+        window.history.replaceState({ page: initialPage }, '', `#/${initialPage}`);
+
+        window.addEventListener('popstate', handlePopState);
+        return () => {
+            window.removeEventListener('popstate', handlePopState);
+        };
+    }, []);
+
 
     // --- Effect to set up and fetch products ---
     useEffect(() => {
@@ -1063,11 +1093,11 @@ function App() {
 
     const handleAddToCart = async (product) => {
         if (!user) {
-            setPage('login');
+            navigate('login');
             return;
         }
         if (user.isAnonymous) {
-            setPage('signup');
+            navigate('signup');
             return;
         }
 
@@ -1078,11 +1108,11 @@ function App() {
 
     const handleAddToWishlist = async (product) => {
         if (!user) {
-            setPage('login');
+            navigate('login');
             return;
         }
          if (user.isAnonymous) {
-            setPage('signup');
+            navigate('signup');
             return;
         }
         
@@ -1099,28 +1129,28 @@ function App() {
 
         switch (page) {
             case 'home':
-                return <HomePage setPage={setPage} products={products} onAddToCart={handleAddToCart} onAddToWishlist={handleAddToWishlist} />;
+                return <HomePage navigate={navigate} products={products} onAddToCart={handleAddToCart} onAddToWishlist={handleAddToWishlist} />;
             case 'cart':
-                return <CartPage cart={cart} setPage={setPage} />;
+                return <CartPage cart={cart} navigate={navigate} />;
             case 'wishlist':
-                return <WishlistPage wishlist={wishlist} onAddToCart={handleAddToCart} setPage={setPage} />;
+                return <WishlistPage wishlist={wishlist} onAddToCart={handleAddToCart} navigate={navigate} />;
             case 'login':
-                return <LoginPage setPage={setPage} />;
+                return <LoginPage navigate={navigate} />;
             case 'signup':
-                return <SignUpPage setPage={setPage} />;
+                return <SignUpPage navigate={navigate} />;
             case 'checkout':
                 return <CheckoutPage cart={cart} />;
             case 'profile':
-                return <ProfilePage setPage={setPage} />;
+                return <ProfilePage navigate={navigate} />;
             case 'admin':
-                return isAdmin ? <AdminPanelPage /> : <NotFoundPage setPage={setPage} />;
+                return isAdmin ? <AdminPanelPage /> : <NotFoundPage navigate={navigate} />;
             default:
                 // Check if it's a product category page
                 const isCategoryPage = initialProducts.some(p => p.category === page);
                 if (isCategoryPage) {
-                    return <ProductListPage category={page} setPage={setPage} onAddToCart={handleAddToCart} onAddToWishlist={handleAddToWishlist} products={products} />;
+                    return <ProductListPage category={page} navigate={navigate} onAddToCart={handleAddToCart} onAddToWishlist={handleAddToWishlist} products={products} />;
                 }
-                return <NotFoundPage setPage={setPage} />;
+                return <NotFoundPage navigate={navigate} />;
         }
     };
 
@@ -1138,11 +1168,11 @@ function App() {
                 .animate-fade-in { animation: fade-in 0.5s ease-out forwards; }
                 .animate-fade-in-up { animation: fade-in-up 0.6s ease-out forwards; }
             `}</style>
-            <Navbar setPage={setPage} cartCount={cart.length} wishlistCount={wishlist.length} />
+            <Navbar navigate={navigate} cartCount={cart.length} wishlistCount={wishlist.length} />
             <main>
                 {loadingProducts ? <div className="text-center py-20">Loading...</div> : renderPage()}
             </main>
-            <Footer setPage={setPage} />
+            <Footer navigate={navigate} />
         </div>
     );
 }
