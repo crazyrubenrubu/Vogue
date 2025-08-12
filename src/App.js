@@ -63,25 +63,21 @@ const AuthProvider = ({ children }) => {
     useEffect(() => {
         const attemptAuth = async () => {
             try {
-                // Use the initial auth token if provided by the environment
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
-                    // Fallback to anonymous sign-in
                     await signInAnonymously(auth);
                 }
             } catch (error) {
                 console.error("Authentication Error:", error);
-                await signInAnonymously(auth); // Fallback to anonymous on error
+                await signInAnonymously(auth);
             }
         };
         
         attemptAuth();
 
-        // Listen for authentication state changes
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             setUser(user);
-            // Check for admin user
             if (user && user.email === 'admin@vogue.com') {
                 setIsAdmin(true);
             } else {
@@ -93,7 +89,7 @@ const AuthProvider = ({ children }) => {
         return () => unsubscribe();
     }, []);
 
-    const value = { user, isAdmin, loading }; // Add isAdmin to context value
+    const value = { user, isAdmin, loading };
 
     return (
         <AuthContext.Provider value={value}>
@@ -103,26 +99,26 @@ const AuthProvider = ({ children }) => {
 };
 
 
-// --- Product Data ---
+// --- Initial Product Data (if Firestore is empty) ---
 const initialProducts = [
     // Men
-    { id: 'm1', name: 'Classic Cotton Shirt', category: 'men-shirts', price: 2499, image: 'https://placehold.co/400x400/E2E8F0/4A5568?text=Men+Shirt' },
-    { id: 'm2', name: 'Graphic Print T-Shirt', category: 'men-t-shirts', price: 999, image: 'https://placehold.co/400x400/E2E8F0/4A5568?text=Men+T-Shirt' },
-    { id: 'm3', name: 'Slim-Fit Chinos', category: 'men-trousers', price: 3499, image: 'https://placehold.co/400x400/E2E8F0/4A5568?text=Men+Trousers' },
-    { id: 'm4', name: 'Wool Blend Peacoat', category: 'men-winter-wear', price: 7999, image: 'https://placehold.co/400x400/E2E8F0/4A5568?text=Men+Winter+Wear' },
+    { id: 'm1', name: 'Classic Cotton Shirt', category: 'men-shirts', price: 2499, image: 'https://placehold.co/400x400/E2E8F0/4A5568?text=Men+Shirt', tags: ['formal', 'office', 'classic'] },
+    { id: 'm2', name: 'Graphic Print T-Shirt', category: 'men-t-shirts', price: 999, image: 'https://placehold.co/400x400/E2E8F0/4A5568?text=Men+T-Shirt', tags: ['casual', 'graphic', 'summer'] },
+    { id: 'm3', name: 'Slim-Fit Chinos', category: 'men-trousers', price: 3499, image: 'https://placehold.co/400x400/E2E8F0/4A5568?text=Men+Trousers', tags: ['smart casual', 'chinos'] },
+    { id: 'm4', name: 'Wool Blend Peacoat', category: 'men-winter-wear', price: 7999, image: 'https://placehold.co/400x400/E2E8F0/4A5568?text=Men+Winter+Wear', tags: ['winter', 'coat', 'warm'] },
     // Women
-    { id: 'w1', name: 'Silk Blouse', category: 'women-tops', price: 2999, image: 'https://placehold.co/400x400/CBD5E0/4A5568?text=Women+Top' },
-    { id: 'w2', name: 'High-Waist Jeans', category: 'women-jeans', price: 4499, image: 'https://placehold.co/400x400/CBD5E0/4A5568?text=Women+Jeans' },
-    { id: 'w3', name: 'A-Line Skirt', category: 'women-skirts', price: 1999, image: 'https://placehold.co/400x400/CBD5E0/4A5568?text=Women+Skirt' },
-    { id: 'w4', name: 'Cashmere Sweater', category: 'women-winter-wear', price: 9999, image: 'https://placehold.co/400x400/CBD5E0/4A5568?text=Women+Winter+Wear' },
+    { id: 'w1', name: 'Silk Blouse', category: 'women-tops', price: 2999, image: 'https://placehold.co/400x400/CBD5E0/4A5568?text=Women+Top', tags: ['elegant', 'party', 'silk'] },
+    { id: 'w2', name: 'High-Waist Jeans', category: 'women-jeans', price: 4499, image: 'https://placehold.co/400x400/CBD5E0/4A5568?text=Women+Jeans', tags: ['denim', 'casual', 'high-waist'] },
+    { id: 'w3', name: 'A-Line Skirt', category: 'women-skirts', price: 1999, image: 'https://placehold.co/400x400/CBD5E0/4A5568?text=Women+Skirt', tags: ['summer', 'skirt', 'casual'] },
+    { id: 'w4', name: 'Cashmere Sweater', category: 'women-winter-wear', price: 9999, image: 'https://placehold.co/400x400/CBD5E0/4A5568?text=Women+Winter+Wear', tags: ['winter', 'warm', 'luxury'] },
     // Children
-    { id: 'c1', name: 'Dinosaur Graphic Tee', category: 'children-t-shirts', price: 799, image: 'https://placehold.co/400x400/BEE3F8/2C5282?text=Kids+T-Shirt' },
-    { id: 'c2', name: 'Fleece-Lined Hoodie', category: 'children-outerwear', price: 1499, image: 'https://placehold.co/400x400/BEE3F8/2C5282?text=Kids+Hoodie' },
-    { id: 'c3', name: 'Pull-On Jeans', category: 'children-bottoms', price: 999, image: 'https://placehold.co/400x400/BEE3F8/2C5282?text=Kids+Jeans' },
+    { id: 'c1', name: 'Dinosaur Graphic Tee', category: 'children-t-shirts', price: 799, image: 'https://placehold.co/400x400/BEE3F8/2C5282?text=Kids+T-Shirt', tags: ['kids', 'dinosaur', 'fun'] },
+    { id: 'c2', name: 'Fleece-Lined Hoodie', category: 'children-outerwear', price: 1499, image: 'https://placehold.co/400x400/BEE3F8/2C5282?text=Kids+Hoodie', tags: ['kids', 'winter', 'warm'] },
+    { id: 'c3', name: 'Pull-On Jeans', category: 'children-bottoms', price: 999, image: 'https://placehold.co/400x400/BEE3F8/2C5282?text=Kids+Jeans', tags: ['kids', 'denim', 'jeans'] },
     // Accessories
-    { id: 'a1', name: 'Leather Belt', category: 'accessories-belts', price: 1299, image: 'https://placehold.co/400x400/D6BCFA/44337A?text=Belt' },
-    { id: 'a2', name: 'Canvas Tote Bag', category: 'accessories-bags', price: 999, image: 'https://placehold.co/400x400/D6BCFA/44337A?text=Bag' },
-    { id: 'a3', name: 'Knit Scarf', category: 'accessories-scarves', price: 799, image: 'https://placehold.co/400x400/D6BCFA/44337A?text=Scarf' },
+    { id: 'a1', name: 'Leather Belt', category: 'accessories-belts', price: 1299, image: 'https://placehold.co/400x400/D6BCFA/44337A?text=Belt', tags: ['leather', 'accessory', 'formal'] },
+    { id: 'a2', name: 'Canvas Tote Bag', category: 'accessories-bags', price: 999, image: 'https://placehold.co/400x400/D6BCFA/44337A?text=Bag', tags: ['bag', 'casual', 'tote'] },
+    { id: 'a3', name: 'Knit Scarf', category: 'accessories-scarves', price: 799, image: 'https://placehold.co/400x400/D6BCFA/44337A?text=Scarf', tags: ['winter', 'scarf', 'warm'] },
 ];
 
 // --- Helper function to setup initial products in Firestore ---
@@ -168,12 +164,28 @@ const UserIcon = () => (
     </svg>
 );
 
+const MenuIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+);
+
+const XIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+);
+
+
 // --- Components ---
 
-const Navbar = ({ navigate, cartCount, wishlistCount }) => {
+const Navbar = ({ navigate, cartCount, wishlistCount, onSearch }) => {
     const { user, isAdmin } = useAuth();
     const [openDropdown, setOpenDropdown] = useState('');
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [mobileSubMenu, setMobileSubMenu] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
 
     const navLinks = {
         Men: { 'Shirts': 'men-shirts', 'T-Shirts': 'men-t-shirts', 'Trousers': 'men-trousers', 'Winter Wear': 'men-winter-wear' },
@@ -186,11 +198,24 @@ const Navbar = ({ navigate, cartCount, wishlistCount }) => {
         await signOut(auth);
         navigate('home');
     };
+    
+    const handleSearchSubmit = (e) => {
+        e.preventDefault();
+        onSearch(searchTerm);
+        setIsSearchOpen(false);
+    };
 
     return (
         <nav className="bg-white shadow-md sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-20">
+                    {/* Hamburger Menu (Mobile) */}
+                    <div className="md:hidden">
+                        <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-gray-600 hover:text-gray-900">
+                            {isMobileMenuOpen ? <XIcon /> : <MenuIcon />}
+                        </button>
+                    </div>
+
                     {/* Logo */}
                     <div className="flex-shrink-0">
                         <a href="#/home" onClick={(e) => {e.preventDefault(); navigate('home')}} className="text-2xl font-bold text-gray-800 tracking-wider">
@@ -219,10 +244,10 @@ const Navbar = ({ navigate, cartCount, wishlistCount }) => {
                     </div>
 
                     {/* Icons & Search */}
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-2 sm:space-x-4">
                          {isAdmin && (
-                            <button onClick={() => navigate('admin')} className="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition">
-                                Admin Panel
+                            <button onClick={() => navigate('admin')} className="hidden sm:block text-sm font-medium text-indigo-600 hover:text-indigo-800 transition">
+                                Admin
                             </button>
                         )}
                         <button onClick={() => setIsSearchOpen(!isSearchOpen)} className="text-gray-600 hover:text-gray-900">
@@ -231,12 +256,6 @@ const Navbar = ({ navigate, cartCount, wishlistCount }) => {
                         {user && !user.isAnonymous ? (
                             <div className="relative group">
                                 <button onClick={() => navigate('profile')} className="text-gray-600 hover:text-gray-900"><UserIcon /></button>
-                                <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">
-                                    <div className="py-1">
-                                        <a href="#/profile" onClick={(e) => {e.preventDefault(); navigate('profile')}} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
-                                        <a href="#" onClick={handleLogout} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</a>
-                                    </div>
-                                </div>
                             </div>
                         ) : (
                             <button onClick={() => navigate('login')} className="text-gray-600 hover:text-gray-900"><UserIcon /></button>
@@ -252,15 +271,45 @@ const Navbar = ({ navigate, cartCount, wishlistCount }) => {
                     </div>
                 </div>
             </div>
+
+            {/* Mobile Menu */}
+            {isMobileMenuOpen && (
+                <div className="md:hidden bg-white border-t">
+                    <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                        {Object.keys(navLinks).map(category => (
+                            <div key={category}>
+                                <button onClick={() => setMobileSubMenu(mobileSubMenu === category ? '' : category)} className="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                                    {category}
+                                </button>
+                                {mobileSubMenu === category && (
+                                    <div className="pl-4">
+                                        {Object.entries(navLinks[category]).map(([subCategory, page]) => (
+                                            <a key={page} href={`#/${page}`} onClick={(e) => {e.preventDefault(); navigate(page); setIsMobileMenuOpen(false);}} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50">
+                                                {subCategory}
+                                            </a>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                         {isAdmin && (
+                             <a href="#/admin" onClick={(e) => {e.preventDefault(); navigate('admin'); setIsMobileMenuOpen(false);}} className="block px-3 py-2 rounded-md text-base font-medium text-indigo-600 hover:text-gray-900 hover:bg-gray-50">
+                                Admin Panel
+                            </a>
+                        )}
+                    </div>
+                </div>
+            )}
+
             {/* Search Bar */}
             {isSearchOpen && (
                 <div className="absolute top-full left-0 w-full bg-white shadow-md p-4 transition-all duration-300">
-                    <div className="max-w-7xl mx-auto flex">
-                        <input type="text" placeholder="Search for products..." className="w-full px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-                        <button className="bg-indigo-600 text-white px-4 py-2 rounded-r-md hover:bg-indigo-700">
+                    <form onSubmit={handleSearchSubmit} className="max-w-7xl mx-auto flex">
+                        <input type="text" placeholder="Search by name, category, or tag..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                        <button type="submit" className="bg-indigo-600 text-white px-4 py-2 rounded-r-md hover:bg-indigo-700">
                             <SearchIcon />
                         </button>
-                    </div>
+                    </form>
                 </div>
             )}
         </nav>
@@ -429,6 +478,27 @@ const ProductListPage = ({ category, navigate, onAddToCart, onAddToWishlist, pro
                     {filteredProducts.map((product) => (
                         <ProductCard key={product.id} product={product} onAddToCart={onAddToCart} onAddToWishlist={onAddToWishlist} navigate={navigate} />
                     ))}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const SearchResultsPage = ({ products, onAddToCart, onAddToWishlist, navigate, searchTerm }) => {
+    return (
+        <div className="bg-white">
+            <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
+                <h2 className="text-2xl font-extrabold tracking-tight text-gray-900">
+                    Search Results for "{searchTerm}"
+                </h2>
+                <div className="mt-6 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
+                    {products.length > 0 ? (
+                        products.map((product) => (
+                            <ProductCard key={product.id} product={product} onAddToCart={onAddToCart} onAddToWishlist={onAddToWishlist} navigate={navigate} />
+                        ))
+                    ) : (
+                        <p className="col-span-full">No products found matching your search.</p>
+                    )}
                 </div>
             </div>
         </div>
@@ -693,12 +763,44 @@ const SignUpPage = ({ navigate }) => {
     );
 };
 
-const CheckoutPage = ({ cart }) => {
+const CheckoutPage = ({ cart, navigate }) => {
     const total = cart.reduce((sum, item) => sum + item.price, 0);
+    const [pincode, setPincode] = useState('');
+    const [city, setCity] = useState('');
+    const [state, setState] = useState('');
+    const [pincodeError, setPincodeError] = useState('');
+    const [paymentMethod, setPaymentMethod] = useState('cod');
+
+    // Fetch address details from Pincode
+    useEffect(() => {
+        if (pincode.length === 6) {
+            setPincodeError('');
+            fetch(`https://api.postalpincode.in/pincode/${pincode}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data[0].Status === 'Success') {
+                        const postOffice = data[0].PostOffice[0];
+                        setCity(postOffice.District);
+                        setState(postOffice.State);
+                    } else {
+                        setPincodeError('Invalid Pincode. Please check and try again.');
+                        setCity('');
+                        setState('');
+                    }
+                })
+                .catch(err => {
+                    setPincodeError('Failed to fetch address. Please enter manually.');
+                    console.error(err);
+                });
+        }
+    }, [pincode]);
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
-        alert('Thank you for your order! (This is a demo)');
+        alert(`Order placed successfully with ${paymentMethod.toUpperCase()}! (This is a demo)`);
+        // Here you would typically handle the order submission to your backend
+        // and potentially redirect to a success page.
+        navigate('home');
     };
 
     return (
@@ -713,24 +815,32 @@ const CheckoutPage = ({ cart }) => {
                         <input type="email" placeholder="Email Address" required className="w-full p-2 border rounded-md" />
                         <input type="text" placeholder="Street Address" required className="w-full p-2 border rounded-md" />
                         <div className="flex space-x-4">
-                            <input type="text" placeholder="City" required className="w-1/2 p-2 border rounded-md" />
-                            <input type="text" placeholder="ZIP Code" required className="w-1/2 p-2 border rounded-md" />
+                             <input type="text" placeholder="Country" value="India" readOnly className="w-1/2 p-2 border rounded-md bg-gray-100" />
+                             <input type="text" placeholder="Pincode" value={pincode} onChange={(e) => setPincode(e.target.value)} required className="w-1/2 p-2 border rounded-md" />
                         </div>
-                        <input type="text" placeholder="Country" required className="w-full p-2 border rounded-md" />
+                        {pincodeError && <p className="text-red-500 text-xs">{pincodeError}</p>}
+                        <div className="flex space-x-4">
+                            <input type="text" placeholder="City / Town" value={city} onChange={(e) => setCity(e.target.value)} required className="w-1/2 p-2 border rounded-md" />
+                            <input type="text" placeholder="State" value={state} onChange={(e) => setState(e.target.value)} required className="w-1/2 p-2 border rounded-md" />
+                        </div>
                         
-                        <h2 className="text-xl font-semibold mb-4 pt-6">Payment Details</h2>
-                        <div className="p-4 border rounded-md bg-gray-50">
-                            <p className="text-gray-600">This is a demo. No real payment will be processed.</p>
-                            <div className="mt-4">
-                                <input type="text" placeholder="Card Number" className="w-full p-2 border rounded-md" />
-                                <div className="flex space-x-4 mt-4">
-                                    <input type="text" placeholder="MM / YY" className="w-1/2 p-2 border rounded-md" />
-                                    <input type="text" placeholder="CVC" className="w-1/2 p-2 border rounded-md" />
-                                </div>
-                            </div>
+                        <h2 className="text-xl font-semibold mb-4 pt-6">Payment Method</h2>
+                        <div className="space-y-4">
+                            <label className="flex items-center p-3 border rounded-md has-[:checked]:bg-indigo-50 has-[:checked]:border-indigo-500">
+                                <input type="radio" name="paymentMethod" value="cod" checked={paymentMethod === 'cod'} onChange={(e) => setPaymentMethod(e.target.value)} className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" />
+                                <span className="ml-3 font-medium">Cash on Delivery (COD)</span>
+                            </label>
+                             <label className="flex items-center p-3 border rounded-md has-[:checked]:bg-indigo-50 has-[:checked]:border-indigo-500">
+                                <input type="radio" name="paymentMethod" value="upi" checked={paymentMethod === 'upi'} onChange={(e) => setPaymentMethod(e.target.value)} className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" />
+                                <span className="ml-3 font-medium">UPI (Paytm, Google Pay, etc.)</span>
+                            </label>
+                             <label className="flex items-center p-3 border rounded-md has-[:checked]:bg-indigo-50 has-[:checked]:border-indigo-500">
+                                <input type="radio" name="paymentMethod" value="razorpay" checked={paymentMethod === 'razorpay'} onChange={(e) => setPaymentMethod(e.target.value)} className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" />
+                                <span className="ml-3 font-medium">Card / Netbanking (via Razorpay)</span>
+                            </label>
                         </div>
 
-                        <button type="submit" className="w-full bg-indigo-600 text-white py-3 rounded-md hover:bg-indigo-700 transition-colors font-semibold">
+                        <button type="submit" className="w-full mt-6 bg-indigo-600 text-white py-3 rounded-md hover:bg-indigo-700 transition-colors font-semibold">
                             Place Order (₹{total.toFixed(2)})
                         </button>
                     </form>
@@ -801,6 +911,7 @@ const AdminPanelPage = () => {
     const [price, setPrice] = useState('');
     const [category, setCategory] = useState('men-shirts');
     const [image, setImage] = useState('');
+    const [tags, setTags] = useState('');
     const [addMessage, setAddMessage] = useState('');
 
     // State for managing existing products
@@ -830,7 +941,18 @@ const AdminPanelPage = () => {
         const productsCollectionRef = collection(db, `/artifacts/${appId}/public/data/products`);
         const unsubscribe = onSnapshot(productsCollectionRef, (snapshot) => {
             const productsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setProducts(productsData);
+            
+            // Group and sort products by category
+            const grouped = productsData.reduce((acc, product) => {
+                const { category } = product;
+                if (!acc[category]) {
+                    acc[category] = [];
+                }
+                acc[category].push(product);
+                return acc;
+            }, {});
+
+            setProducts(grouped);
             setLoading(false);
         });
         return () => unsubscribe();
@@ -846,11 +968,14 @@ const AdminPanelPage = () => {
 
         try {
             const productsCollectionRef = collection(db, `/artifacts/${appId}/public/data/products`);
+            const tagsArray = tags.split(',').map(tag => tag.trim().toLowerCase()).filter(tag => tag);
+            
             await addDoc(productsCollectionRef, {
                 name,
                 price: Number(price),
                 category,
-                image
+                image,
+                tags: tagsArray
             });
             setAddMessage('Product added successfully!');
             // Clear form
@@ -858,6 +983,7 @@ const AdminPanelPage = () => {
             setPrice('');
             setCategory('men-shirts');
             setImage('');
+            setTags('');
             setTimeout(() => setAddMessage(''), 3000);
         } catch (error) {
             console.error("Error adding product: ", error);
@@ -907,6 +1033,10 @@ const AdminPanelPage = () => {
                         <label htmlFor="image" className="block text-sm font-medium text-gray-700">Image URL</label>
                         <input type="url" id="image" value={image} onChange={(e) => setImage(e.target.value)} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
                     </div>
+                     <div>
+                        <label htmlFor="tags" className="block text-sm font-medium text-gray-700">Tags (comma-separated)</label>
+                        <input type="text" id="tags" value={tags} onChange={(e) => setTags(e.target.value)} placeholder="e.g. casual, summer, festive" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                    </div>
                     {addMessage && <p className={`text-sm ${addMessage.includes('Error') ? 'text-red-500' : 'text-green-500'}`}>{addMessage}</p>}
                     <div>
                         <button type="submit" className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
@@ -924,22 +1054,31 @@ const AdminPanelPage = () => {
                     {loading ? (
                         <p>Loading products...</p>
                     ) : (
-                        <ul className="divide-y divide-gray-200">
-                            {products.map(product => (
-                                <li key={product.id} className="py-4 flex items-center justify-between">
-                                    <div className="flex items-center">
-                                        <img src={product.image} alt={product.name} className="h-16 w-16 rounded-md object-cover mr-4" />
-                                        <div>
-                                            <p className="font-semibold">{product.name}</p>
-                                            <p className="text-sm text-gray-500">₹{product.price}</p>
-                                        </div>
-                                    </div>
-                                    <button onClick={() => handleDeleteProduct(product.id)} className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition">
-                                        Delete
-                                    </button>
-                                </li>
+                        <div className="space-y-8">
+                            {Object.keys(products).sort().map(categoryKey => (
+                                <div key={categoryKey}>
+                                    <h3 className="text-lg font-semibold text-gray-800 border-b pb-2 mb-4">
+                                        {productCategories.find(c => c.value === categoryKey)?.label || categoryKey}
+                                    </h3>
+                                    <ul className="divide-y divide-gray-200">
+                                        {products[categoryKey].map(product => (
+                                            <li key={product.id} className="py-4 flex items-center justify-between">
+                                                <div className="flex items-center">
+                                                    <img src={product.image} alt={product.name} className="h-16 w-16 rounded-md object-cover mr-4" />
+                                                    <div>
+                                                        <p className="font-semibold">{product.name}</p>
+                                                        <p className="text-sm text-gray-500">₹{product.price}</p>
+                                                    </div>
+                                                </div>
+                                                <button onClick={() => handleDeleteProduct(product.id)} className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition">
+                                                    Delete
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
                             ))}
-                        </ul>
+                        </div>
                     )}
                 </div>
             </div>
@@ -1010,6 +1149,7 @@ function App() {
     const [wishlist, setWishlist] = useState([]);
     const [products, setProducts] = useState([]);
     const [loadingProducts, setLoadingProducts] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
     const { user, isAdmin } = useAuth();
 
     // This function handles navigation and updates browser history
@@ -1030,7 +1170,6 @@ function App() {
             }
         };
 
-        // Set initial page from URL hash
         const initialPage = window.location.hash.substring(2) || 'home';
         setPage(initialPage);
         window.history.replaceState({ page: initialPage }, '', `#/${initialPage}`);
@@ -1071,14 +1210,12 @@ function App() {
 
         const userId = user.uid;
 
-        // Cart listener
         const cartCollectionRef = collection(db, `/artifacts/${appId}/users/${userId}/cart`);
         const cartUnsubscribe = onSnapshot(cartCollectionRef, (snapshot) => {
             const cartData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             setCart(cartData);
         });
 
-        // Wishlist listener
         const wishlistCollectionRef = collection(db, `/artifacts/${appId}/users/${userId}/wishlist`);
         const wishlistUnsubscribe = onSnapshot(wishlistCollectionRef, (snapshot) => {
             const wishlistData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -1120,6 +1257,21 @@ function App() {
         const wishlistDocRef = doc(db, `/artifacts/${appId}/users/${userId}/wishlist`, product.id);
         await setDoc(wishlistDocRef, product);
     };
+    
+    const handleSearch = (term) => {
+        setSearchTerm(term);
+        navigate('search');
+    };
+    
+    const getFilteredProducts = () => {
+        if (!searchTerm) return [];
+        const lowercasedTerm = searchTerm.toLowerCase();
+        return products.filter(product => 
+            product.name.toLowerCase().includes(lowercasedTerm) ||
+            product.category.toLowerCase().includes(lowercasedTerm) ||
+            (product.tags && product.tags.some(tag => tag.toLowerCase().includes(lowercasedTerm)))
+        );
+    };
 
     const renderPage = () => {
         if (page.startsWith('product/')) {
@@ -1139,13 +1291,14 @@ function App() {
             case 'signup':
                 return <SignUpPage navigate={navigate} />;
             case 'checkout':
-                return <CheckoutPage cart={cart} />;
+                return <CheckoutPage cart={cart} navigate={navigate} />;
             case 'profile':
                 return <ProfilePage navigate={navigate} />;
             case 'admin':
                 return isAdmin ? <AdminPanelPage /> : <NotFoundPage navigate={navigate} />;
+            case 'search':
+                return <SearchResultsPage products={getFilteredProducts()} onAddToCart={handleAddToCart} onAddToWishlist={handleAddToWishlist} navigate={navigate} searchTerm={searchTerm} />;
             default:
-                // Check if it's a product category page
                 const isCategoryPage = initialProducts.some(p => p.category === page);
                 if (isCategoryPage) {
                     return <ProductListPage category={page} navigate={navigate} onAddToCart={handleAddToCart} onAddToWishlist={handleAddToWishlist} products={products} />;
@@ -1168,7 +1321,7 @@ function App() {
                 .animate-fade-in { animation: fade-in 0.5s ease-out forwards; }
                 .animate-fade-in-up { animation: fade-in-up 0.6s ease-out forwards; }
             `}</style>
-            <Navbar navigate={navigate} cartCount={cart.length} wishlistCount={wishlist.length} />
+            <Navbar navigate={navigate} cartCount={cart.length} wishlistCount={wishlist.length} onSearch={handleSearch} />
             <main>
                 {loadingProducts ? <div className="text-center py-20">Loading...</div> : renderPage()}
             </main>
